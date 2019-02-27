@@ -63,8 +63,10 @@ func ExampleWalk_wrapInt64InString() {
 			key = key[1 : len(key)-1]
 		}
 
-		// test for field with suffix _id
-		wrap := bytes.HasSuffix(key, suffix)
+		// Test for field with suffix _id and value is an int64 number. For
+		// valid json, value will never be empty, so we can safely test only the
+		// first byte.
+		wrap := bytes.HasSuffix(key, suffix) && value[0] > '0' && value[0] <= '9'
 
 		// transform the input, wrap values in double quote
 		if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {

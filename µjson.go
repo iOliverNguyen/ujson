@@ -1,8 +1,13 @@
 // Package µjson implements a minimal JSON parser and transformer (works with
 // valid input only). Example use cases:
 //
-//   1. Walk through unstructured json
-//   2. Transform unstructured json
+//     1. Walk through unstructured json:
+//       - Print all keys
+//       - Extract some values
+//     2. Transform unstructured json:
+//       - Remove all spaces
+//       - Remove blacklist fields
+//       - Wrap int64 in string for processing by JavaScript
 //
 // without fully unmarshalling it into a map[string]interface{}
 //
@@ -23,7 +28,7 @@ func Walk(input []byte, callback func(st int, key, value []byte) bool) error {
 	var key []byte
 	i, si, ei, st, sst := 0, 0, 0, 0, 1024
 
-	// Trim the last newline
+	// trim the last newline
 	if len(input) > 0 && input[len(input)-1] == '\n' {
 		input = input[:len(input)-1]
 	}
@@ -145,13 +150,14 @@ func parseError(i int, c byte, msg string) error {
 // ShouldAddComma decides if a comma should be appended while constructing
 // output json. See Reconstruct for an example of rebuilding the json.
 func ShouldAddComma(value []byte, lastChar byte) bool {
-	// the expression inside parentheses is same as string(value) != '}' && string(value) != ']'
-	return (len(value) == 0 || value[0] != '}' && value[0] != ']') &&
+	// for valid json, the value will never be empty, so we can safely test only
+	// the first byte
+	return value[0] != '}' && value[0] != ']' &&
 		lastChar != ',' && lastChar != '{' && lastChar != '['
 }
 
 // Reconstruct walks through the input json and rebuild it. It's put here as an
-// example for using Walk.
+// example of using Walk.
 func Reconstruct(input []byte) ([]byte, error) {
 	b := make([]byte, 0, len(input))
 	err := Walk(input, func(st int, key, value []byte) bool {

@@ -1,12 +1,17 @@
 # µjson
 
-[![Build Status](https://travis-ci.org/ng-vu/sqlgen.svg?branch=master)](https://travis-ci.org/ng-vu/sqlgen)
+[![Build Status](https://travis-ci.org/ng-vu/ujson.svg?branch=master)](https://travis-ci.org/ng-vu/ujson)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg)](http://godoc.org/github.com/ng-vu/ujson)
 
 A minimal implementation of a json parser and transformer. Example use cases:
 
-1. Walk through unstructured json
-2. Transform unstructured json
+1. Walk through unstructured json:
+   - [Print all keys](https://godoc.org/github.com/ng-vu/ujson#example-Walk)
+   - Extract some values
+2. Transform unstructured json:
+   - [Remove all spaces](https://godoc.org/github.com/ng-vu/ujson#example-Walk--Reconstruct)
+   - [Remove blacklist fields](https://godoc.org/github.com/ng-vu/ujson#example-Walk--RemoveBlacklistFields)
+   - [Wrap int64 in string for processing by JavaScript](https://godoc.org/github.com/ng-vu/ujson#example-Walk--WrapInt64InString)
 
 without fully unmarshalling it into a `map[string]interface{}`.
 

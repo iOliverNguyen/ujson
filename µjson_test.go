@@ -8,8 +8,8 @@ import (
 
 func TestWalk(t *testing.T) {
 	tests := []struct {
-		inp string
-		exp string
+		input    string
+		expected string
 	}{
 		{
 			`null`,
@@ -311,36 +311,38 @@ func TestWalk(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run("Walk/"+tt.inp, func(t *testing.T) {
+		t.Run("Walk/"+tt.input, func(t *testing.T) {
 			var b strings.Builder
-			err := Walk([]byte(tt.inp),
+			err := Walk([]byte(tt.input),
 				func(st int, key, value []byte) bool {
 					fmt.Fprintf(&b, "\n%v %s %s", st, key, value)
 					return true
 				})
 			if err != nil {
 				t.Error(err)
-			} else if b.String() != tt.exp {
-				t.Errorf("\nExpect: `%v`\nOutput: `%v`\n", tt.exp, b.String())
+			} else if b.String() != tt.expected {
+				t.Errorf("\nExpect: `%v`\nOutput: `%v`\n", tt.expected, b.String())
 			}
 		})
 	}
 
 	for _, tt := range tests {
-		t.Run("Reconstruct/"+tt.inp, func(t *testing.T) {
-
-			// Handle the sepcial testcase ending with \n
-			exp := tt.inp
-			if exp[len(exp)-1] == '\n' {
-				exp = exp[:len(exp)-1]
+		t.Run("Reconstruct/"+tt.input, func(t *testing.T) {
+			// Handle the special testcase ending with newline. This test
+			// reconstructs output json and compare with the input. Because
+			// reconstruct will not append the last newline, so we must trim it
+			// before comparing.
+			expected := tt.input
+			if expected[len(expected)-1] == '\n' {
+				expected = expected[:len(expected)-1]
 			}
-			exp = strings.Replace(exp, " ", "", -1)
+			expected = strings.Replace(expected, " ", "", -1)
 
-			data, err := Reconstruct([]byte(tt.inp))
+			data, err := Reconstruct([]byte(tt.input))
 			if err != nil {
 				t.Error(err)
-			} else if s := string(data); s != exp {
-				t.Errorf("\nExpect: %v\nOutput: %v\n", exp, s)
+			} else if s := string(data); s != expected {
+				t.Errorf("\nExpect: %v\nOutput: %v\n", expected, s)
 			}
 		})
 	}
