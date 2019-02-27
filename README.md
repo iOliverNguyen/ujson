@@ -10,6 +10,7 @@ A minimal implementation of a json parser and transformer. Example use cases:
    - Extract some values
 2. Transform unstructured json:
    - [Remove all spaces](https://godoc.org/github.com/ng-vu/ujson#example-Walk--Reconstruct)
+   - [Reformat](https://godoc.org/github.com/ng-vu/ujson#example-Walk--Reformat)
    - [Remove blacklist fields](https://godoc.org/github.com/ng-vu/ujson#example-Walk--RemoveBlacklistFields)
    - [Wrap int64 in string for processing by JavaScript](https://godoc.org/github.com/ng-vu/ujson#example-Walk--WrapInt64InString)
 

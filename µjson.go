@@ -6,6 +6,7 @@
 //       - Extract some values
 //     2. Transform unstructured json:
 //       - Remove all spaces
+//       - Reformat
 //       - Remove blacklist fields
 //       - Wrap int64 in string for processing by JavaScript
 //

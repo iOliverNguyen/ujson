@@ -52,6 +52,42 @@ func ExampleWalk_reconstruct() {
 	// Output: {"order_id":12345678901234,"number":12,"item_id":12345678905678,"counting":[1,2,3]}
 }
 
+func ExampleWalk_reformat() {
+	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,2,3]}`)
+
+	b := make([]byte, 0, 256)
+	err := ujson.Walk(input, func(st int, key, value []byte) bool {
+		if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
+			b = append(b, ',')
+		}
+		b = append(b, '\n')
+		for i := 0; i < st; i++ {
+			b = append(b, '\t')
+		}
+		if len(key) > 0 {
+			b = append(b, key...)
+			b = append(b, `: `...)
+		}
+		b = append(b, value...)
+		return true
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%s", b)
+	// Output:
+	// {
+	//	"order_id": 12345678901234,
+	//	"number": 12,
+	//	"item_id": 12345678905678,
+	//	"counting": [
+	//		1,
+	//		2,
+	//		3
+	//	]
+	// }
+}
+
 func ExampleWalk_wrapInt64InString() {
 	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,2,3]}`)
 
