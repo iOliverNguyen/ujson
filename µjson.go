@@ -1,0 +1,169 @@
+// Package µjson implements a minimal JSON parser and transformer (works with
+// valid input only). Example use cases:
+//
+//   1. Walk through unstructured json
+//   2. Transform unstructured json
+//
+// without fully unmarshalling it into a map[string]interface{}
+//
+// CAUTION: Behaviour is undefined on invalid json. Use on trusted input only.
+package ujson
+
+import "fmt"
+
+// Walk parses the given json and call "callback" for each key. See examples for
+// sample callback params.
+//
+// The function "callback":
+//
+//     - may convert key and value to string for processing
+//     - may return false to skip processing the current object or array
+//     - must not modify any slice it receives.
+func Walk(input []byte, callback func(st int, key, value []byte) bool) error {
+	var key []byte
+	i, si, ei, st, sst := 0, 0, 0, 0, 1024
+
+	// Trim the last newline
+	if len(input) > 0 && input[len(input)-1] == '\n' {
+		input = input[:len(input)-1]
+	}
+
+value:
+	si = i
+	switch input[i] {
+	case 'n', 't': // null, true
+		i += 4
+		ei = i
+		if st <= sst {
+			callback(st, key, input[si:i])
+		}
+		key = nil
+		goto closing
+	case 'f': // false
+		i += 5
+		ei = i
+		if st <= sst {
+			callback(st, key, input[si:i])
+		}
+		key = nil
+		goto closing
+	case '{', '[':
+		if st <= sst && !callback(st, key, input[i:i+1]) {
+			sst = st
+		}
+		key = nil
+		st++
+		i++
+		if input[i] == '}' || input[i] == ']' {
+			goto closing
+		}
+		goto value
+	case '"': // scan string
+		for {
+			i++
+			switch input[i] {
+			case '\\': // \. - skip 2
+				i++
+			case '"': // end of string
+				i++
+				ei = i // space, ignore
+				for input[i] == ' ' ||
+					input[i] == '\t' ||
+					input[i] == '\n' ||
+					input[i] == '\r' {
+					i++
+				}
+				if input[i] != ':' {
+					if st <= sst {
+						callback(st, key, input[si:ei])
+					}
+					key = nil
+				}
+				goto closing
+			}
+		}
+	case ' ', '\t', '\n', '\r': // space, ignore
+		i++
+		goto value
+	default: // scan number
+		for i < len(input) {
+			switch input[i] {
+			case ',', '}', ']', ' ', '\t', '\n', '\r':
+				ei = i
+				for input[i] == ' ' ||
+					input[i] == '\t' ||
+					input[i] == '\n' ||
+					input[i] == '\r' {
+					i++
+				}
+				if st <= sst {
+					callback(st, key, input[si:ei])
+				}
+				key = nil
+				goto closing
+			}
+			i++
+		}
+	}
+
+closing:
+	if i >= len(input) {
+		return nil
+	}
+	switch input[i] {
+	case ':':
+		key = input[si:ei]
+		i++
+		goto value
+	case ',':
+		i++
+		goto value
+	case ']', '}':
+		st--
+		if st == sst {
+			sst = 1024
+		} else {
+			callback(st, nil, input[i:i+1])
+		}
+		if st <= 0 {
+			return nil
+		}
+		i++
+		goto closing
+	case ' ', '\t', '\n', '\r':
+		i++ // space, ignore
+		goto closing
+	default:
+		return parseError(i, input[i], `expect ']', '}' or ','`)
+	}
+}
+
+func parseError(i int, c byte, msg string) error {
+	return fmt.Errorf("µjson: error at %v '%c' 0x%2x: %v", i, c, c, msg)
+}
+
+// ShouldAddComma decides if a comma should be appended while constructing
+// output json. See Reconstruct for an example of rebuilding the json.
+func ShouldAddComma(value []byte, lastChar byte) bool {
+	// the expression inside parentheses is same as string(value) != '}' && string(value) != ']'
+	return (len(value) == 0 || value[0] != '}' && value[0] != ']') &&
+		lastChar != ',' && lastChar != '{' && lastChar != '['
+}
+
+// Reconstruct walks through the input json and rebuild it. It's put here as an
+// example for using Walk.
+func Reconstruct(input []byte) ([]byte, error) {
+	b := make([]byte, 0, len(input))
+	err := Walk(input, func(st int, key, value []byte) bool {
+		if len(b) != 0 && ShouldAddComma(value, b[len(b)-1]) {
+			b = append(b, ',')
+		}
+		if len(key) > 0 {
+			b = append(b, key...)
+			b = append(b, ':')
+		}
+		b = append(b, value...)
+		return true
+	})
+	return b, err
+}
