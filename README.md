@@ -1,5 +1,6 @@
 # µjson
 
+[![Build Status](https://travis-ci.org/ng-vu/sqlgen.svg?branch=master)](https://travis-ci.org/ng-vu/sqlgen)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg)](http://godoc.org/github.com/ng-vu/ujson)
 
 A minimal implementation of a json parser and transformer. Example use cases:
