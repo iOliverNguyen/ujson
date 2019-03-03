@@ -34,7 +34,7 @@ func AppendQuoteString(dst []byte, s string) []byte {
 }
 
 // Unquote decodes a double-quoted string key or value to retrieve the
-// underlying string value. It will avoid allocation whenever possible.
+// original string value. It will avoid allocation whenever possible.
 //
 // The code is inspired by strconv.Unquote, but only accepts valid json string.
 func Unquote(s []byte) ([]byte, error) {
