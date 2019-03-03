@@ -2,7 +2,7 @@
 // valid input only). Example use cases:
 //
 //     1. Walk through unstructured json:
-//       - Print all keys
+//       - Print all keys and values
 //       - Extract some values
 //     2. Transform unstructured json:
 //       - Remove all spaces

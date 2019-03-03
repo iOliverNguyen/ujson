@@ -7,30 +7,8 @@ import (
 	"unsafe"
 )
 
-// ErrSyntax indicates that the valid has invalid syntax.
+// ErrSyntax indicates that the value has invalid syntax.
 var ErrSyntax = strconv.ErrSyntax
-
-const lowerhex = "0123456789abcdef"
-
-// isGraphic lists the graphic runes not matched by IsPrint.
-var isGraphic = []uint16{
-	0x00a0,
-	0x1680,
-	0x2000,
-	0x2001,
-	0x2002,
-	0x2003,
-	0x2004,
-	0x2005,
-	0x2006,
-	0x2007,
-	0x2008,
-	0x2009,
-	0x200a,
-	0x202f,
-	0x205f,
-	0x3000,
-}
 
 // AppendQuote appends a double-quoted string valid for json key and value, to
 // dst and returns the extended buffer.

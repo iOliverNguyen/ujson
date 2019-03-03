@@ -8,7 +8,7 @@ import (
 )
 
 func ExampleWalk() {
-	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,2,3]}`)
+	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
 	err := ujson.Walk(input, func(st int, key, value []byte) bool {
 		fmt.Println(st, string(key), string(value))
@@ -24,14 +24,14 @@ func ExampleWalk() {
 	// 1 "item_id" 12345678905678
 	// 1 "counting" [
 	// 2  1
-	// 2  2
+	// 2  "2"
 	// 2  3
 	// 1  ]
 	// 0  }
 }
 
 func ExampleWalk_reconstruct() {
-	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,2,3]}`)
+	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
 	b := make([]byte, 0, 256)
 	err := ujson.Walk(input, func(st int, key, value []byte) bool {
@@ -49,11 +49,11 @@ func ExampleWalk_reconstruct() {
 		panic(err)
 	}
 	fmt.Printf("%s", b)
-	// Output: {"order_id":12345678901234,"number":12,"item_id":12345678905678,"counting":[1,2,3]}
+	// Output: {"order_id":12345678901234,"number":12,"item_id":12345678905678,"counting":[1,"2",3]}
 }
 
 func ExampleWalk_reformat() {
-	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,2,3]}`)
+	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
 	b := make([]byte, 0, 256)
 	err := ujson.Walk(input, func(st int, key, value []byte) bool {
@@ -82,14 +82,14 @@ func ExampleWalk_reformat() {
 	//	"item_id": 12345678905678,
 	//	"counting": [
 	//		1,
-	//		2,
+	//		"2",
 	//		3
 	//	]
 	// }
 }
 
 func ExampleWalk_wrapInt64InString() {
-	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,2,3]}`)
+	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
 	suffix := []byte(`_id`)
 	b := make([]byte, 0, 256)
@@ -127,11 +127,11 @@ func ExampleWalk_wrapInt64InString() {
 		panic(err)
 	}
 	fmt.Printf("%s", b)
-	// Output: {"order_id":"12345678901234","number":12,"item_id":"12345678905678","counting":[1,2,3]}
+	// Output: {"order_id":"12345678901234","number":12,"item_id":"12345678905678","counting":[1,"2",3]}
 }
 
 func ExampleWalk_removeBlacklistFields() {
-	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,2,3]}`)
+	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
 	blacklistFields := bytes.Split([]byte(`number,counting`), []byte(`,`))
 	b := make([]byte, 0, 256)
