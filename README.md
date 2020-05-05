@@ -1,7 +1,8 @@
 # µjson
 
-[![Build Status](https://travis-ci.org/ng-vu/ujson.svg?branch=master)](https://travis-ci.org/ng-vu/ujson)
-[![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg)](http://godoc.org/github.com/ng-vu/ujson)
+[![Build Status](http://img.shields.io/travis/ng-vu/ujson.svg?style=flat-square)](https://travis-ci.org/ng-vu/ujson)
+[![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://pkg.go.dev/github.com/ng-vu/ujson)
+[![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/ng-vu/ujson/master/LICENSE)
 
 A fast and minimal JSON parser and transformer that works on unstructured json.
 Example use cases:
@@ -76,7 +77,3 @@ When processing arrays and objects, first the open bracket (`[`, `{`) will be
 provided as `value`, followed by its children, and finally the close bracket
 (`]`, `}`). When encounting open brackets, You can make the callback function
 return `false` to skip the array/object entirely.
-
-## LICENSE
-
-[MIT License](https://opensource.org/licenses/mit-license.php)
