@@ -75,7 +75,7 @@ func Unquote(s []byte) ([]byte, error) {
 		if c < utf8.RuneSelf || !multibyte {
 			buf = append(buf, byte(c))
 		} else {
-			n := utf8.EncodeRune(runeTmp[:], c)
+			n = utf8.EncodeRune(runeTmp[:], c)
 			buf = append(buf, runeTmp[:n]...)
 		}
 	}

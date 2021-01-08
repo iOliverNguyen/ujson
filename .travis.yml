@@ -1,12 +1,11 @@
 language: go
-go_import_path: github.com/ng-vu/ujson
+go_import_path: github.com/olvrng/ujson
 go:
-- 1.11.x
-- 1.12.x
 - 1.13.x
 - 1.14.x
+- 1.15.x
 script:
 - export PATH=$PATH:$HOME/gopath/bin
 - export GORACE="halt_on_error=1"
-- env GO111MODULE=on go install ./...
-- env GO111MODULE=on go test -v -race ./...
+- go install ./...
+- go test -v -race ./...

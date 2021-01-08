@@ -1,3 +1,3 @@
-module github.com/ng-vu/ujson
+module github.com/olvrng/ujson
 
 go 1.11

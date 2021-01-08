@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/ng-vu/ujson"
+	"github.com/olvrng/ujson"
 )
 
 func ExampleWalk() {
 	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
-	err := ujson.Walk(input, func(indent int, key, value []byte) bool {
-		fmt.Println(indent, string(key), string(value))
+	err := ujson.Walk(input, func(level int, key, value []byte) bool {
+		fmt.Println(level, string(key), string(value))
 		return true
 	})
 	if err != nil {
@@ -34,7 +34,7 @@ func ExampleWalk_reconstruct() {
 	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
 	b := make([]byte, 0, 256)
-	err := ujson.Walk(input, func(indent int, key, value []byte) bool {
+	err := ujson.Walk(input, func(level int, key, value []byte) bool {
 		if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
 			b = append(b, ',')
 		}
@@ -56,12 +56,12 @@ func ExampleWalk_reformat() {
 	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
 	b := make([]byte, 0, 256)
-	err := ujson.Walk(input, func(indent int, key, value []byte) bool {
+	err := ujson.Walk(input, func(level int, key, value []byte) bool {
 		if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
 			b = append(b, ',')
 		}
 		b = append(b, '\n')
-		for i := 0; i < indent; i++ {
+		for i := 0; i < level; i++ {
 			b = append(b, '\t')
 		}
 		if len(key) > 0 {

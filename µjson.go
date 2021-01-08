@@ -27,23 +27,23 @@
 //
 // Calling "Walk()" with the above input will produce:
 //
-//    | indent | key        | value   |
-//    |--------|------------|---------|
-//    |   0    |            | {       |
-//    |   1    | "id"       | 12345   |
-//    |   1    | "name"     | "foo"   |
-//    |   1    | "numbers"  | [       |
-//    |   2    |            | "one"   |
-//    |   2    |            | "two"   |
-//    |   1    |            | ]       |
-//    |   1    | "tags"     | {       |
-//    |   2    | "color"    | "red"   |
-//    |   2    | "priority" | "high"  |
-//    |   1    |            | }       |
-//    |   1    | "active"   | true    |
-//    |   0    |            | }       |
+//    | level | key        | value   |
+//    |-------|------------|---------|
+//    |   0   |            | {       |
+//    |   1   | "id"       | 12345   |
+//    |   1   | "name"     | "foo"   |
+//    |   1   | "numbers"  | [       |
+//    |   2   |            | "one"   |
+//    |   2   |            | "two"   |
+//    |   1   |            | ]       |
+//    |   1   | "tags"     | {       |
+//    |   2   | "color"    | "red"   |
+//    |   2   | "priority" | "high"  |
+//    |   1   |            | }       |
+//    |   1   | "active"   | true    |
+//    |   0   |            | }       |
 //
-// "indent" indicates the indentation of the key/value pair as if the json is
+// "level" indicates the indentation of the key/value pair as if the json is
 // formatted properly. Keys and values are provided as raw literal. Strings are
 // always double-quoted. To get the original string, use "Unquote".
 //
@@ -59,8 +59,8 @@
 //
 // When processing arrays and objects, first the open bracket ("[", "{") will be
 // provided as "value", followed by its children, and finally the close bracket
-// ("]", "}"). When encounting open brackets, You can make the callback function
-// return "false" to skip the array/object entirely.
+// ("]", "}"). When encountering open brackets, you can make the callback
+// function return "false" to skip the array/object entirely.
 package ujson
 
 import "fmt"
@@ -73,7 +73,7 @@ import "fmt"
 //     - may convert key and value to string for processing
 //     - may return false to skip processing the current object or array
 //     - must not modify any slice it receives.
-func Walk(input []byte, callback func(indent int, key, value []byte) bool) error {
+func Walk(input []byte, callback func(level int, key, value []byte) bool) error {
 	var key []byte
 	i, si, ei, st, sst := 0, 0, 0, 0, 1024
 

@@ -3,7 +3,7 @@ package ujson_test
 import (
 	"testing"
 
-	. "github.com/ng-vu/ujson"
+	. "github.com/olvrng/ujson"
 )
 
 type quoteTest struct {
