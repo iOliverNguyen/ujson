@@ -5,7 +5,18 @@
 [![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/olvrng/ujson/master/LICENSE)
 
 A fast and minimal JSON parser and transformer that works on unstructured json.
-Example use cases:
+
+## Motivation
+
+Sometimes we just want to make some minimal changes to a json document, or do
+some generic transformations without fully unmarshalling it. For example,
+removing [blacklist fields](https://godoc.org/github.com/olvrng/ujson#example-Walk--RemoveBlacklistFields2)
+from response json. Why spend all the cost on unmarshalling into a `map[string]interface{}`
+just to immediate marshal it again.
+
+Read more on [dev.to/olvrng](https://dev.to/olvrng/json-a-minimal-json-parser-and-transformer-in-go-3dhb).
+
+### Example use cases:
 
 1. Walk through unstructured json:
    - [Print all keys and values](https://godoc.org/github.com/olvrng/ujson#example-Walk)
@@ -13,12 +24,12 @@ Example use cases:
 2. Transform unstructured json:
    - [Remove all spaces](https://godoc.org/github.com/olvrng/ujson#example-Walk--Reconstruct)
    - [Reformat](https://godoc.org/github.com/olvrng/ujson#example-Walk--Reformat)
-   - [Remove blacklist fields](https://godoc.org/github.com/olvrng/ujson#example-Walk--RemoveBlacklistFields)
+   - [Remove blacklist fields](https://godoc.org/github.com/olvrng/ujson#example-Walk--RemoveBlacklistFields2)
    - [Wrap int64 in string for processing by JavaScript](https://godoc.org/github.com/olvrng/ujson#example-Walk--WrapInt64InString)
 
 without fully unmarshalling it into a `map[string]interface{}`.
 
-See usage and examples on [godoc.org](https://godoc.org/github.com/olvrng/ujson).
+See usage and examples on [godoc.org](https://godoc.org/github.com/olvrng/ujson) and [dev.to/olvrng](https://dev.to/olvrng/json-a-minimal-json-parser-and-transformer-in-go-3dhb).
 
 **Important**: *Behaviour is undefined on invalid json. Use on trusted input
 only. For untrusted input, you may want to run it through
@@ -34,11 +45,11 @@ Let's see an example:
 
 ```json
 {
-    "id": 12345,
-    "name": "foo",
-    "numbers": ["one", "two"],
-    "tags": {"color": "red", "priority": "high"},
-    "active": true
+   "id": 12345,
+   "name": "foo",
+   "numbers": ["one", "two"],
+   "tags": {"color": "red", "priority": "high"},
+   "active": true
 }
 ```
 

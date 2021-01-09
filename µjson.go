@@ -176,7 +176,7 @@ closing:
 		st--
 		if st == sst {
 			sst = 1024
-		} else {
+		} else if st < sst {
 			callback(st, nil, input[i:i+1])
 		}
 		if st <= 0 {

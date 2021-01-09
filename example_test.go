@@ -131,29 +131,34 @@ func ExampleWalk_wrapInt64InString() {
 }
 
 func ExampleWalk_removeBlacklistFields() {
-	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
+	input := []byte(`{
+        "id": 12345,
+        "name": "foo",
+        "numbers": ["one", "two"],
+        "tags": {"color": "red", "priority": "high"},
+        "active": true
+    }`)
 
-	blacklistFields := bytes.Split([]byte(`number,counting`), []byte(`,`))
-	b := make([]byte, 0, 256)
+	blacklistFields := [][]byte{
+		[]byte(`"numbers"`), // note the quotes
+		[]byte(`"active"`),
+	}
+	b := make([]byte, 0, 1024)
 	err := ujson.Walk(input, func(_ int, key, value []byte) bool {
-		// unquote key and compare with blacklist
 		if len(key) != 0 {
-			key = key[1 : len(key)-1]
 			for _, blacklist := range blacklistFields {
 				if bytes.Equal(key, blacklist) {
-					return false // remove the field from the output
+					// remove the key and value from the output
+					return false
 				}
 			}
 		}
-
-		// transform the input
+		// write to output
 		if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
 			b = append(b, ',')
 		}
 		if len(key) > 0 {
-			b = append(b, '"')
 			b = append(b, key...)
-			b = append(b, '"')
 			b = append(b, ':')
 		}
 		b = append(b, value...)
@@ -163,5 +168,59 @@ func ExampleWalk_removeBlacklistFields() {
 		panic(err)
 	}
 	fmt.Printf("%s", b)
-	// Output: {"order_id":12345678901234,"item_id":12345678905678}
+	// Output: {"id":12345,"name":"foo","tags":{"color":"red","priority":"high"}}
+}
+
+// This example was taken from StackOverflow:
+// https://stackoverflow.com/questions/35441254/making-minimal-modification-to-json-data-without-a-structure-in-golang
+func ExampleWalk_removeBlacklistFields2() {
+	input := []byte(`
+{
+  "responseHeader": {
+    "status": 0,
+    "QTime": 0,
+    "params": {
+      "q": "solo",
+      "wt": "json"
+    }
+  },
+  "response": {
+    "numFound": 2,
+    "start": 0,
+    "docs": [
+      { "name": "foo" },
+      { "name": "bar" }
+    ]
+  }
+}`)
+
+	blacklistFields := [][]byte{
+		[]byte(`"responseHeader"`), // note the quotes
+	}
+	b := make([]byte, 0, 1024)
+	err := ujson.Walk(input, func(_ int, key, value []byte) bool {
+		if len(key) != 0 {
+			for _, blacklist := range blacklistFields {
+				if bytes.Equal(key, blacklist) {
+					// remove the key and value from the output
+					return false
+				}
+			}
+		}
+		// write to output
+		if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
+			b = append(b, ',')
+		}
+		if len(key) > 0 {
+			b = append(b, key...)
+			b = append(b, ':')
+		}
+		b = append(b, value...)
+		return true
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%s", b)
+	// Output: {"response":{"numFound":2,"start":0,"docs":[{"name":"foo"},{"name":"bar"}]}}
 }
