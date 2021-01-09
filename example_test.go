@@ -175,38 +175,37 @@ func ExampleWalk_removeBlacklistFields() {
 // https://stackoverflow.com/questions/35441254/making-minimal-modification-to-json-data-without-a-structure-in-golang
 func ExampleWalk_removeBlacklistFields2() {
 	input := []byte(`
-{
-  "responseHeader": {
-    "status": 0,
-    "QTime": 0,
-    "params": {
-      "q": "solo",
-      "wt": "json"
-    }
-  },
-  "response": {
-    "numFound": 2,
-    "start": 0,
-    "docs": [
-      { "name": "foo" },
-      { "name": "bar" }
-    ]
-  }
-}`)
+	{
+	  "responseHeader": {
+		"status": 0,
+		"QTime": 0,
+		"params": {
+		  "q": "solo",
+		  "wt": "json"
+		}
+	  },
+	  "response": {
+		"numFound": 2,
+		"start": 0,
+		"docs": [
+		  { "name": "foo" },
+		  { "name": "bar" }
+		]
+	  }
+	}`)
 
 	blacklistFields := [][]byte{
 		[]byte(`"responseHeader"`), // note the quotes
 	}
 	b := make([]byte, 0, 1024)
 	err := ujson.Walk(input, func(_ int, key, value []byte) bool {
-		if len(key) != 0 {
-			for _, blacklist := range blacklistFields {
-				if bytes.Equal(key, blacklist) {
-					// remove the key and value from the output
-					return false
-				}
+		for _, blacklist := range blacklistFields {
+			if bytes.Equal(key, blacklist) {
+				// remove the key and value from the output
+				return false
 			}
 		}
+
 		// write to output
 		if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
 			b = append(b, ',')
