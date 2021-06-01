@@ -6,7 +6,7 @@
 [![Build Status](http://img.shields.io/travis/olvrng/ujson.svg?style=flat-square)](https://travis-ci.org/olvrng/ujson)
 [![Github code coverage](https://img.shields.io/badge/code%20coverage-97%25-brightgreen?style=flat-square)](https://gocover.io/github.com/olvrng/ujson)
 
-A fast and minimal JSON parser and transformer that works on unstructured json.
+A fast and minimal JSON parser and transformer that works on unstructured JSON.
 It works by parsing input and calling the given callback function when
 encountering each item.
 
@@ -14,10 +14,10 @@ Read more on [the introduction article](https://hackernoon.com/json-a-minimal-js
 
 ## Motivation
 
-Sometimes we just want to make some minimal changes to a json document, or do
+Sometimes we just want to make some minimal changes to a JSON document, or do
 some generic transformations without fully unmarshalling it. For example,
 removing [blacklist fields](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-RemoveBlacklistFields2)
-from response json. Why spend all the cost on unmarshalling into a `map[string]interface{}`
+from response JSON. Why spend all the cost on unmarshalling into a `map[string]interface{}`
 just to immediate marshal it again.
 
 The following code is taken from [StackOverflow](https://stackoverflow.com/questions/35441254/making-minimal-modification-to-json-data-without-a-structure-in-golang?ref=hackernoon.com):
@@ -93,7 +93,7 @@ So we need to wrap those int64s into strings before sending them to JavaScript.
 In Go and PostgreSQL, the JSON is `{"order_id": 12345678}` but JavaScript will
 see it as `{"order_id": "12345678"}` (note that the value is quoted). In Go, we
 can define a custom type and implement the
-[json.Marshaler](https://golang.org/pkg/encoding/json/#Marshaler) interface. But
+[`json.Marshaler`](https://golang.org/pkg/encoding/json/#Marshaler) interface. But
 in PostgreSQL, that’s just not possible or too complicated. I wrote a service
 that receives JSON from PostgreSQL and converts it to be consumable by
 JavaScript. The service also removes some blacklisted keys or does some other
@@ -101,10 +101,11 @@ transformations (for example, change `orderId` to `order_id`).
 
 ### Example use cases:
 
-1. Walk through unstructured json:
+1. Walk through unstructured JSON:
    - [Print all keys and values](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk)
    - Extract some values
-2. Transform unstructured json:
+    
+2. Transform unstructured JSON:
    - [Remove all spaces](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-Reconstruct)
    - [Reformat](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-Reformat)
    - [Remove blacklist fields](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-RemoveBlacklistFields2)
@@ -115,7 +116,7 @@ without fully unmarshalling it into a `map[string]interface{}`.
 See usage and examples on
 [pkg.go.dev](https://pkg.go.dev/github.com/olvrng/ujson).
 
-**Important**: *Behaviour is undefined on invalid json. Use on trusted input
+**Important**: *Behaviour is undefined on invalid JSON. Use on trusted input
 only. For untrusted input, you may want to run it through
 [`json.Valid()`](https://golang.org/pkg/encoding/json/#Valid) first.*
 
@@ -123,7 +124,7 @@ only. For untrusted input, you may want to run it through
 
 The single most important function is [`Walk(input,
 callback)`](https://pkg.go.dev/github.com/olvrng/ujson#Walk), which parses the
-`input` json and call `callback` function for each key/value pair processed.
+`input` JSON and call `callback` function for each key/value pair processed.
 
 The callback function is called when an object key/value or an array key is
 encountered. It receives 3 params in order: `level`, `key` and `value`.
@@ -210,9 +211,10 @@ Calling `Walk()` with the above input will produce:
 |`1`    |`"active"`  |`true`   |
 |`0`    |            |`}`      |
 
-### 0. The simplest example
+### 0. The simplest examples
 
-To easily get an idea on level, key and value, here are the simplest examples:
+To easily get an idea on `level`, `key` and `value`, here are the simplest
+examples:
 
 ```go
  input0 := []byte(`true`)
@@ -245,12 +247,13 @@ To easily get an idea on level, key and value, here are the simplest examples:
 ```
 
 In the first example, there is only a single boolean value. The callback
-function is called once with level=0, key is empty and value=true.
+function is called once with `level=0`, `key` is empty and `value=true`.
 
 In the second example, the callback function is called 3 times. Two times for
-open and close brackets with level=0, key is empty and value is the bracketed
-character. The other time for the only key with level=1, key is "key" and
-value=42. Note that the key is quoted and you need to call ujson.Unquote() to
+open and close brackets with `level=0`, `key` is empty and `value` is the
+bracketed character. The other time for the only key with `level=1`, `key` is
+`"key"` and `value=42`. Note that the key is quoted and you need to call
+[`ujson.Unquote()`](https://pkg.go.dev/github.com/olvrng/ujson#Unquote) to
 retrieve the unquoted string.
 
 The last example is like the second, but with an array instead. Keys are always
@@ -262,8 +265,9 @@ In this example, the input JSON is formatted with correct indentation. As
 processing the input key by key, the callback function reconstructs the JSON. It
 outputs each key/value pair in its own line, prefixed with spaces equal to the
 param level. There is a catch, though. Valid JSON requires commas between values
-in objects and arrays. So there is ujson.ShouldAddComma() for checking whether a
-comma should be inserted.
+in objects and arrays. So there is
+[`ujson.ShouldAddComma()`](https://pkg.go.dev/github.com/olvrng/ujson#ShouldAddComma)
+for checking whether a comma should be inserted.
 
 ```go
  input := []byte(`{"id":12345,"name":"foo","numbers":["one","two"],"tags":{"color":"red","priority":"high"},"active":true}`)
@@ -319,7 +323,7 @@ is compared with a pre-defined list. If there is a match, the blacklisted key
 and its value are dropped. The callback function returns false for skipping the
 entire value (which may be an object or array). Note that the list is quoted,
 i.e. "numbers" and "active" instead of number and active. For more advanced
-checking, you may want to run ujson.Unquote() on the key.
+checking, you may want to run [`ujson.Unquote()`](https://pkg.go.dev/github.com/olvrng/ujson#Unquote) on the key.
 
 ```go
  input := []byte(`{
