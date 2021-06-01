@@ -1,8 +1,10 @@
 # µjson
 
-[![Build Status](http://img.shields.io/travis/olvrng/ujson.svg?style=flat-square)](https://travis-ci.org/olvrng/ujson)
 [![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://pkg.go.dev/github.com/olvrng/ujson)
 [![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/olvrng/ujson/master/LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/olvrng/ujson?style=flat-square)](https://goreportcard.com/report/github.com/olvrng/ujson)
+[![Build Status](http://img.shields.io/travis/olvrng/ujson.svg?style=flat-square)](https://travis-ci.org/olvrng/ujson)
+[![Github code coverage](https://img.shields.io/badge/code%20coverage-97%25-brightgreen?style=flat-square)](https://gocover.io/github.com/olvrng/ujson)
 
 A fast and minimal JSON parser and transformer that works on unstructured json.
 It works by parsing input and calling the given callback function when
