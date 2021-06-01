@@ -1,4 +1,4 @@
-// Package µjson implements a fast and minimal JSON parser and transformer that
+// Package ujson implements a fast and minimal JSON parser and transformer that
 // works on unstructured json. Example use cases:
 //
 //     1. Walk through unstructured json:

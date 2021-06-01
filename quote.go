@@ -28,7 +28,7 @@ func AppendQuoteToGraphic(dst []byte, s []byte) []byte {
 	return strconv.AppendQuoteToGraphic(dst, unsafeBytesToString(s))
 }
 
-// QuoteString returns a double-quoted string valid for json key or value.
+// AppendQuoteString returns a double-quoted string valid for json key or value.
 func AppendQuoteString(dst []byte, s string) []byte {
 	return strconv.AppendQuote(dst, s)
 }
