@@ -63,10 +63,10 @@ func removeBlacklistFields(input []byte) []byte {
 			}
 		}
 		// write to output
-		if len(b) != 0 &amp;&amp; ujson.ShouldAddComma(value, b[len(b)-1]) {
+		if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
 			b = append(b, ',')
 		}
-		if len(key) &gt; 0 {
+		if len(key) > 0 {
 			b = append(b, key...)
 			b = append(b, ':')
 		}
@@ -81,7 +81,7 @@ func removeBlacklistFields(input []byte) []byte {
 ```
 
 The original scenario that leads me to write the package is because of
-**int64***. When working in Go and PostgreSQL, I use ***int64*** (instead of
+***int64***. When working in Go and PostgreSQL, I use ***int64*** (instead of
 ***string***) for ***ids*** because it’s more effective and has enormous space
 for randomly generated ids. It’s not as big as UUID, 128 bits, but still big
 enough for production use. In PostgreSQL, those ids can be stored as
@@ -370,7 +370,7 @@ checking, you may want to run [`ujson.Unquote()`](https://pkg.go.dev/github.com/
 {"id":12345,"name":"foo","tags":{"color":"red","priority":"high"}}
 ```
 
-### Wrap int64 in string
+### 4. Wrap int64 in string
 
 This is the original motivation behind µjson. The following example finds keys
 ending with `_id"` (`"order_id"`, `"item_id"`, etc.) and converts their values
