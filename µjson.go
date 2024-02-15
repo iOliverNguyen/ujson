@@ -85,9 +85,16 @@ type WalkFunc func(level int, key, value []byte) WalkFuncRtnType
 //   - may convert key and value to string for processing
 //   - may return false to skip processing the current object or array
 //   - must not modify any slice it receives.
-func Walk(input []byte, callback WalkFunc) error {
+func Walk(input []byte, callback WalkFunc) (ret error) {
 	var key []byte
 	i, si, ei, st, sst := 0, 0, 0, 0, 1024
+
+	// return error, do not panic
+	defer func() {
+		if r := recover(); r != nil {
+			ret = fmt.Errorf("µjson: error at %v: %v", i, r)
+		}
+	}()
 
 	// trim the last newline
 	if len(input) > 0 && input[len(input)-1] == '\n' {

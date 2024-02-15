@@ -347,3 +347,13 @@ func TestWalk(t *testing.T) {
 		})
 	}
 }
+
+func TestWalk_panic(t *testing.T) {
+	input := []byte(`{"foo":f`)
+	err := Walk(input, func(level int, key, value []byte) WalkFuncRtnType {
+		return WalkRtnValDefault
+	})
+	if err == nil {
+		t.Errorf("Expect error")
+	}
+}
