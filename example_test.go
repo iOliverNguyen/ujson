@@ -10,9 +10,9 @@ import (
 func ExampleWalk() {
 	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
-	err := ujson.Walk(input, func(level int, key, value []byte) bool {
+	err := ujson.Walk(input, func(level int, key, value []byte) ujson.WalkFuncRtnType {
 		fmt.Println(level, string(key), string(value))
-		return true
+		return ujson.WalkRtnValDefault
 	})
 	if err != nil {
 		panic(err)
@@ -34,7 +34,7 @@ func ExampleWalk_reconstruct() {
 	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
 	b := make([]byte, 0, 256)
-	err := ujson.Walk(input, func(level int, key, value []byte) bool {
+	err := ujson.Walk(input, func(level int, key, value []byte) ujson.WalkFuncRtnType {
 		if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
 			b = append(b, ',')
 		}
@@ -43,7 +43,7 @@ func ExampleWalk_reconstruct() {
 			b = append(b, ':')
 		}
 		b = append(b, value...)
-		return true
+		return ujson.WalkRtnValDefault
 	})
 	if err != nil {
 		panic(err)
@@ -56,7 +56,7 @@ func ExampleWalk_reformat() {
 	input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
 	b := make([]byte, 0, 256)
-	err := ujson.Walk(input, func(level int, key, value []byte) bool {
+	err := ujson.Walk(input, func(level int, key, value []byte) ujson.WalkFuncRtnType {
 		if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
 			b = append(b, ',')
 		}
@@ -69,7 +69,7 @@ func ExampleWalk_reformat() {
 			b = append(b, `: `...)
 		}
 		b = append(b, value...)
-		return true
+		return ujson.WalkRtnValDefault
 	})
 	if err != nil {
 		panic(err)
@@ -93,7 +93,7 @@ func ExampleWalk_wrapInt64InString() {
 
 	suffix := []byte(`_id`)
 	b := make([]byte, 0, 256)
-	err := ujson.Walk(input, func(_ int, key, value []byte) bool {
+	err := ujson.Walk(input, func(_ int, key, value []byte) ujson.WalkFuncRtnType {
 		// unquote key
 		if len(key) != 0 {
 			key = key[1 : len(key)-1]
@@ -121,7 +121,7 @@ func ExampleWalk_wrapInt64InString() {
 		if wrap {
 			b = append(b, '"')
 		}
-		return true
+		return ujson.WalkRtnValDefault
 	})
 	if err != nil {
 		panic(err)
@@ -144,12 +144,12 @@ func ExampleWalk_removeBlacklistFields() {
 		[]byte(`"active"`),
 	}
 	b := make([]byte, 0, 1024)
-	err := ujson.Walk(input, func(_ int, key, value []byte) bool {
+	err := ujson.Walk(input, func(_ int, key, value []byte) ujson.WalkFuncRtnType {
 		if len(key) != 0 {
 			for _, blacklist := range blacklistFields {
 				if bytes.Equal(key, blacklist) {
 					// remove the key and value from the output
-					return false
+					return ujson.WalkRtnValSkipObject
 				}
 			}
 		}
@@ -162,7 +162,7 @@ func ExampleWalk_removeBlacklistFields() {
 			b = append(b, ':')
 		}
 		b = append(b, value...)
-		return true
+		return ujson.WalkRtnValDefault
 	})
 	if err != nil {
 		panic(err)
@@ -198,11 +198,11 @@ func ExampleWalk_removeBlacklistFields2() {
 		[]byte(`"responseHeader"`), // note the quotes
 	}
 	b := make([]byte, 0, 1024)
-	err := ujson.Walk(input, func(_ int, key, value []byte) bool {
+	err := ujson.Walk(input, func(_ int, key, value []byte) ujson.WalkFuncRtnType {
 		for _, blacklist := range blacklistFields {
 			if bytes.Equal(key, blacklist) {
 				// remove the key and value from the output
-				return false
+				return ujson.WalkRtnValSkipObject
 			}
 		}
 
@@ -215,7 +215,7 @@ func ExampleWalk_removeBlacklistFields2() {
 			b = append(b, ':')
 		}
 		b = append(b, value...)
-		return true
+		return ujson.WalkRtnValDefault
 	})
 	if err != nil {
 		panic(err)

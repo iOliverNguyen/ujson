@@ -314,9 +314,9 @@ func TestWalk(t *testing.T) {
 		t.Run("Walk/"+tt.input, func(t *testing.T) {
 			var b strings.Builder
 			err := Walk([]byte(tt.input),
-				func(st int, key, value []byte) bool {
+				func(st int, key, value []byte) WalkFuncRtnType {
 					fmt.Fprintf(&b, "\n%v %s %s", st, key, value)
-					return true
+					return WalkRtnValDefault
 				})
 			if err != nil {
 				t.Error(err)

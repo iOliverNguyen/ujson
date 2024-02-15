@@ -65,6 +65,18 @@ package ujson
 
 import "fmt"
 
+// return enum for WalkFunc
+type WalkFuncRtnType int
+
+const (
+	WalkRtnValDefault    WalkFuncRtnType = iota
+	WalkRtnValSkipObject                 // skip the current object or array
+	WalkRtnValQuit                       // quit the walk
+	WalkRtnValError                      // error
+)
+
+type WalkFunc func(level int, key, value []byte) WalkFuncRtnType
+
 // Walk parses the given json and call "callback" for each key/value pair. See
 // examples for sample callback params.
 //
@@ -73,7 +85,7 @@ import "fmt"
 //   - may convert key and value to string for processing
 //   - may return false to skip processing the current object or array
 //   - must not modify any slice it receives.
-func Walk(input []byte, callback func(level int, key, value []byte) bool) error {
+func Walk(input []byte, callback WalkFunc) error {
 	var key []byte
 	i, si, ei, st, sst := 0, 0, 0, 0, 1024
 
@@ -89,7 +101,10 @@ value:
 		i += 4
 		ei = i
 		if st <= sst {
-			callback(st, key, input[si:i])
+			switch callback(st, key, input[si:i]) {
+			case WalkRtnValQuit:
+				return nil
+			}
 		}
 		key = nil
 		goto closing
@@ -97,13 +112,21 @@ value:
 		i += 5
 		ei = i
 		if st <= sst {
-			callback(st, key, input[si:i])
+			switch callback(st, key, input[si:i]) {
+			case WalkRtnValQuit:
+				return nil
+			}
 		}
 		key = nil
 		goto closing
 	case '{', '[':
-		if st <= sst && !callback(st, key, input[i:i+1]) {
-			sst = st
+		if st <= sst {
+			switch callback(st, key, input[i:i+1]) {
+			case WalkRtnValQuit:
+				return nil
+			case WalkRtnValSkipObject:
+				sst = st
+			}
 		}
 		key = nil
 		st++
@@ -135,7 +158,10 @@ value:
 				}
 				if input[i] != ':' {
 					if st <= sst {
-						callback(st, key, input[si:ei])
+						switch callback(st, key, input[si:ei]) {
+						case WalkRtnValQuit:
+							return nil
+						}
 					}
 					key = nil
 				}
@@ -157,7 +183,10 @@ value:
 					i++
 				}
 				if st <= sst {
-					callback(st, key, input[si:ei])
+					switch callback(st, key, input[si:ei]) {
+					case WalkRtnValQuit:
+						return nil
+					}
 				}
 				key = nil
 				goto closing
@@ -183,7 +212,10 @@ closing:
 		if st == sst {
 			sst = 1024
 		} else if st < sst {
-			callback(st, nil, input[i:i+1])
+			switch callback(st, nil, input[i:i+1]) {
+			case WalkRtnValQuit:
+				return nil
+			}
 		}
 		if st <= 0 {
 			return nil
@@ -215,7 +247,7 @@ func ShouldAddComma(value []byte, lastChar byte) bool {
 // example of using Walk.
 func Reconstruct(input []byte) ([]byte, error) {
 	b := make([]byte, 0, len(input))
-	err := Walk(input, func(st int, key, value []byte) bool {
+	err := Walk(input, func(st int, key, value []byte) WalkFuncRtnType {
 		if len(b) != 0 && ShouldAddComma(value, b[len(b)-1]) {
 			b = append(b, ',')
 		}
@@ -224,7 +256,7 @@ func Reconstruct(input []byte) ([]byte, error) {
 			b = append(b, ':')
 		}
 		b = append(b, value...)
-		return true
+		return WalkRtnValDefault
 	})
 	return b, err
 }
