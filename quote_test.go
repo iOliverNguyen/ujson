@@ -1,9 +1,7 @@
-package ujson_test
+package ujson
 
 import (
 	"testing"
-
-	. "github.com/olvrng/ujson"
 )
 
 type quoteTest struct {
