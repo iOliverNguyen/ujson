@@ -1,6 +1,7 @@
 package ujson
 
 import (
+	"context"
 	"strings"
 )
 
@@ -14,6 +15,7 @@ type MatchCallback struct {
 type MatchOptions struct {
 	IgnoreCase       bool
 	QuitIfNoCallback bool
+	AsyncCallback    bool
 }
 
 type MatchResult struct {
@@ -27,18 +29,21 @@ const (
 // iterate the json and call matching callback for each key/value pair.
 // TODO: add support for object and array
 func Match(input []byte, opt *MatchOptions, res *MatchResult, cbs ...*MatchCallback) error {
+	ctx := context.Background()
+
 	paths := make([][]byte, 0, InitialPathsDepth)
 	if opt == nil {
 		opt = &MatchOptions{
 			IgnoreCase:       true,
 			QuitIfNoCallback: true,
+			AsyncCallback:    false,
 		}
 	}
 	if res == nil {
-		res = &MatchResult{
-			Count: 0,
-		}
+		res = &MatchResult{}
 	}
+	res.Count = 0
+
 	err := Walk(input, func(level int, key, value []byte) WalkFuncRtnType {
 		if len(cbs) == 0 {
 			// do nothing if no callbacks
@@ -81,6 +86,15 @@ func Match(input []byte, opt *MatchOptions, res *MatchResult, cbs ...*MatchCallb
 					continue
 				}
 
+				// check if previous async callback failed
+				if opt.AsyncCallback {
+					select {
+					case <-ctx.Done():
+						return WalkRtnValError
+					default:
+					}
+				}
+
 				// if match, we call the callback but do not append to newCbs
 				isMatch := true
 				for i, p := range cb.paths {
@@ -106,8 +120,16 @@ func Match(input []byte, opt *MatchOptions, res *MatchResult, cbs ...*MatchCallb
 			} else {
 				// always append the match-all callback to newCbs
 				newCbs = append(newCbs, cb)
-				if err := cb.cb(paths, value); err != nil {
-					return WalkRtnValError
+				if opt.AsyncCallback {
+					go func(ctx context.Context, cb *MatchCallback) {
+						if err := cb.cb(paths, value); err != nil {
+							ctx.Done()
+						}
+					}(ctx, cb)
+				} else {
+					if err := cb.cb(paths, value); err != nil {
+						return WalkRtnValError
+					}
 				}
 			}
 

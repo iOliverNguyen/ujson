@@ -332,6 +332,7 @@ func TestArgoApplication(t *testing.T) {
 	opt := MatchOptions{
 		IgnoreCase:       false,
 		QuitIfNoCallback: true,
+		AsyncCallback:    false,
 	}
 	res := MatchResult{
 		Count: 0,
@@ -342,8 +343,22 @@ func TestArgoApplication(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// print time taken
-	fmt.Printf("Time taken for Match(): %v\n", time.Since(begin))
+	// print sync time taken
+	fmt.Printf("Time taken for sync Match(): %v\n", time.Since(begin))
+	// assert count is 225
+	if res.Count != 225 {
+		t.Fatal("expected count to be 225")
+	}
+
+	opt.AsyncCallback = true
+	// save start time
+	begin = time.Now()
+	err = Match(input, &opt, &res, callbacks...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// print async time taken
+	fmt.Printf("Time taken for async Match(): %v\n", time.Since(begin))
 	// assert count is 225
 	if res.Count != 225 {
 		t.Fatal("expected count to be 225")
