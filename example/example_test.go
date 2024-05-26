@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/olvrng/ujson"
+	"github.com/iOliverNguyen/ujson"
 )
 
 func ExampleWalk() {
