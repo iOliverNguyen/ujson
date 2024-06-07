@@ -3,7 +3,6 @@
 [![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://pkg.go.dev/github.com/olvrng/ujson)
 [![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/olvrng/ujson/master/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/olvrng/ujson?style=flat-square)](https://goreportcard.com/report/github.com/olvrng/ujson)
-[![Build Status](http://img.shields.io/travis/olvrng/ujson.svg?style=flat-square)](https://travis-ci.org/olvrng/ujson)
 [![Github code coverage](https://img.shields.io/badge/code%20coverage-97%25-brightgreen?style=flat-square)](https://gocover.io/github.com/olvrng/ujson)
 
 A fast and minimal JSON parser and transformer that works on unstructured JSON.
@@ -49,35 +48,35 @@ to remove "responseHeader" completely from all responses, once and forever:
 
 ```go
 func removeBlacklistFields(input []byte) []byte {
-    blacklistFields := [][]byte{
-		[]byte(`"responseHeader"`), // note the quotes
-	}
-	b := make([]byte, 0, 1024)
-	err := ujson.Walk(input, func(_ int, key, value []byte) bool {
-		if len(key) != 0 {
-			for _, blacklist := range blacklistFields {
-				if bytes.Equal(key, blacklist) {
-					// remove the key and value from the output
-					return false
-				}
-			}
-		}
-		// write to output
-		if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
-			b = append(b, ',')
-		}
-		if len(key) > 0 {
-			b = append(b, key...)
-			b = append(b, ':')
-		}
-		b = append(b, value...)
-		return true
-	})
-	if err != nil {
-		panic(err)
-	}
-	return b
- }
+blacklistFields := [][]byte{
+[]byte(`"responseHeader"`), // note the quotes
+}
+b := make([]byte, 0, 1024)
+err := ujson.Walk(input, func(_ int, key, value []byte) bool {
+if len(key) != 0 {
+for _, blacklist := range blacklistFields {
+if bytes.Equal(key, blacklist) {
+// remove the key and value from the output
+return false
+}
+}
+}
+// write to output
+if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
+b = append(b, ',')
+}
+if len(key) > 0 {
+b = append(b, key...)
+b = append(b, ':')
+}
+b = append(b, value...)
+return true
+})
+if err != nil {
+panic(err)
+}
+return b
+}
 ```
 
 The original scenario that leads me to write the package is because of
@@ -102,14 +101,14 @@ transformations (for example, change `orderId` to `order_id`).
 ### Example use cases:
 
 1. Walk through unstructured JSON:
-   - [Print all keys and values](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk)
-   - Extract some values
-    
+    - [Print all keys and values](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk)
+    - Extract some values
+
 2. Transform unstructured JSON:
-   - [Remove all spaces](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-Reconstruct)
-   - [Reformat](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-Reformat)
-   - [Remove blacklist fields](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-RemoveBlacklistFields2)
-   - [Wrap int64 in string for processing by JavaScript](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-WrapInt64InString)
+    - [Remove all spaces](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-Reconstruct)
+    - [Reformat](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-Reformat)
+    - [Remove blacklist fields](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-RemoveBlacklistFields2)
+    - [Wrap int64 in string for processing by JavaScript](https://pkg.go.dev/github.com/olvrng/ujson#example-Walk-WrapInt64InString)
 
 without fully unmarshalling it into a `map[string]interface{}`.
 
@@ -176,20 +175,20 @@ This example gives a quick idea about how *µjson* works.
      "numbers": ["one", "two"],  
      "tags": {"color": "red", "priority": "high"},   
      "active": true  
- }`) 
- ujson.Walk(input, func(level int, key, value []byte) bool { 
-     fmt.Printf("%2v% 12s : %s\n", level, key, value)    
-     return true 
- })
+ }`)
+ujson.Walk(input, func(level int, key, value []byte) bool {
+fmt.Printf("%2v% 12s : %s\n", level, key, value)
+return true
+})
 ```
 
 ```json
 {
-   "id": 12345,
-   "name": "foo",
-   "numbers": ["one", "two"],
-   "tags": {"color": "red", "priority": "high"},
-   "active": true
+  "id": 12345,
+  "name": "foo",
+  "numbers": ["one", "two"],
+  "tags": {"color": "red", "priority": "high"},
+  "active": true
 }
 ```
 
@@ -218,32 +217,32 @@ examples:
 
 ```go
  input0 := []byte(`true`)
- ujson.Walk(input0, func(level int, key, value []byte) bool {
-     fmt.Printf("level=%v key=%s value=%s\n", level, key, value)
-     return true
- })
- // output:
- //   level=0 key= value=true
+ujson.Walk(input0, func(level int, key, value []byte) bool {
+fmt.Printf("level=%v key=%s value=%s\n", level, key, value)
+return true
+})
+// output:
+//   level=0 key= value=true
 
- input1 := []byte(`{ "key": 42 }`)
- ujson.Walk(input1, func(level int, key, value []byte) bool {
-     fmt.Printf("level=%v key=%s value=%s\n", level, key, value)
-     return true
- })
- // output:
- //   level=0 key= value={
- //   level=1 key="key" value=42
- //   level=0 key= value=}
+input1 := []byte(`{ "key": 42 }`)
+ujson.Walk(input1, func(level int, key, value []byte) bool {
+fmt.Printf("level=%v key=%s value=%s\n", level, key, value)
+return true
+})
+// output:
+//   level=0 key= value={
+//   level=1 key="key" value=42
+//   level=0 key= value=}
 
- input2 := []byte(`[ true ]`)
- ujson.Walk(input2, func(level int, key, value []byte) bool {
-     fmt.Printf("level=%v key=%s value=%s\n", level, key, value)
-     return true
- })
- // output:
- //   level=0 key= value=[
- //   level=1 key= value=true
- //   level=0 key= value=]
+input2 := []byte(`[ true ]`)
+ujson.Walk(input2, func(level int, key, value []byte) bool {
+fmt.Printf("level=%v key=%s value=%s\n", level, key, value)
+return true
+})
+// output:
+//   level=0 key= value=[
+//   level=1 key= value=true
+//   level=0 key= value=]
 ```
 
 In the first example, there is only a single boolean value. The callback
@@ -272,43 +271,43 @@ for checking whether a comma should be inserted.
 ```go
  input := []byte(`{"id":12345,"name":"foo","numbers":["one","two"],"tags":{"color":"red","priority":"high"},"active":true}`)
 
- b := make([]byte, 0, 1024)
- err := ujson.Walk(input, func(level int, key, value []byte) bool {
-     if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
-         b = append(b, ',')
-     }
-     b = append(b, '\n')
-     for i := 0; i < level; i++ {
-         b = append(b, '\t')
-     }
-     if len(key) > 0 {
-         b = append(b, key...)
-         b = append(b, `: `...)
-     }
-     b = append(b, value...)
-     return true
- })
- if err != nil {
-     panic(err)
- }
- fmt.Printf("%s\n", b)
+b := make([]byte, 0, 1024)
+err := ujson.Walk(input, func(level int, key, value []byte) bool {
+if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
+b = append(b, ',')
+}
+b = append(b, '\n')
+for i := 0; i < level; i++ {
+b = append(b, '\t')
+}
+if len(key) > 0 {
+b = append(b, key...)
+b = append(b, `: `...)
+}
+b = append(b, value...)
+return true
+})
+if err != nil {
+panic(err)
+}
+fmt.Printf("%s\n", b)
 ```
 
 #### Output:
 
 ```json
 {
-	"id": 12345,
-	"name": "foo",
-	"numbers": [
-		"one",
-		"two"
-	],
-	"tags": {
-		"color": "red",
-		"priority": "high"
-	},
-	"active": true
+  "id": 12345,
+  "name": "foo",
+  "numbers": [
+    "one",
+    "two"
+  ],
+  "tags": {
+    "color": "red",
+    "priority": "high"
+  },
+  "active": true
 }
 ```
 
@@ -334,34 +333,34 @@ checking, you may want to run [`ujson.Unquote()`](https://pkg.go.dev/github.com/
      "active": true
  }`)
 
- blacklistFields := [][]byte{
-     []byte(`"numbers"`), // note the quotes
-     []byte(`"active"`),
- }
- b := make([]byte, 0, 1024)
- err := ujson.Walk(input, func(_ int, key, value []byte) bool {
-     for _, blacklist := range blacklistFields {
-         if bytes.Equal(key, blacklist) {
-             // remove the key and value from the output
-             return false
-         }
-     }
+blacklistFields := [][]byte{
+[]byte(`"numbers"`), // note the quotes
+[]byte(`"active"`),
+}
+b := make([]byte, 0, 1024)
+err := ujson.Walk(input, func(_ int, key, value []byte) bool {
+for _, blacklist := range blacklistFields {
+if bytes.Equal(key, blacklist) {
+// remove the key and value from the output
+return false
+}
+}
 
-     // write to output
-     if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
-         b = append(b, ',')
-     }
-     if len(key) > 0 {
-         b = append(b, key...)
-         b = append(b, ':')
-     }
-     b = append(b, value...)
-     return true
- })
- if err != nil {
-     panic(err)
- }
- fmt.Printf("%s\n", b)
+// write to output
+if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
+b = append(b, ',')
+}
+if len(key) > 0 {
+b = append(b, key...)
+b = append(b, ':')
+}
+b = append(b, value...)
+return true
+})
+if err != nil {
+panic(err)
+}
+fmt.Printf("%s\n", b)
 ```
 
 #### Output:
@@ -392,34 +391,34 @@ then insert double-quotes.
 ```go
  input := []byte(`{"order_id": 12345678901234, "number": 12, "item_id": 12345678905678, "counting": [1,"2",3]}`)
 
- suffix := []byte(`_id"`) // note the ending quote "
- b := make([]byte, 0, 256)
- err := ujson.Walk(input, func(_ int, key, value []byte) bool {
-     // Test for keys with suffix _id" and value is an int64 number. For valid json,
-     // values will never be empty, so we can safely test only the first byte.
-     shouldWrap := bytes.HasSuffix(key, suffix) && value[0] > '0' && value[0] <= '9'
+suffix := []byte(`_id"`) // note the ending quote "
+b := make([]byte, 0, 256)
+err := ujson.Walk(input, func(_ int, key, value []byte) bool {
+// Test for keys with suffix _id" and value is an int64 number. For valid json,
+// values will never be empty, so we can safely test only the first byte.
+shouldWrap := bytes.HasSuffix(key, suffix) && value[0] > '0' && value[0] <= '9'
 
-     // transform the input, wrap values in double quotes
-     if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
-         b = append(b, ',')
-     }
-     if len(key) > 0 {
-         b = append(b, key...)
-         b = append(b, ':')
-     }
-     if shouldWrap {
-         b = append(b, '"')
-     }
-     b = append(b, value...)
-     if shouldWrap {
-         b = append(b, '"')
-     }
-     return true
- })
- if err != nil {
-     panic(err)
- }
- fmt.Printf("%s\n", b)
+// transform the input, wrap values in double quotes
+if len(b) != 0 && ujson.ShouldAddComma(value, b[len(b)-1]) {
+b = append(b, ',')
+}
+if len(key) > 0 {
+b = append(b, key...)
+b = append(b, ':')
+}
+if shouldWrap {
+b = append(b, '"')
+}
+b = append(b, value...)
+if shouldWrap {
+b = append(b, '"')
+}
+return true
+})
+if err != nil {
+panic(err)
+}
+fmt.Printf("%s\n", b)
 ```
 
 #### Output:
@@ -429,6 +428,10 @@ then insert double-quotes.
 ```
 
 After processing, the numbers in `"order_id"` and `"item_id"` are quoted as strings. And JavaScript should be happy now! 🎉 🎉
+
+## Author
+
+<a href="https://olivernguyen.io"><img alt="olivernguyen.io" src="https://olivernguyen.io/_/badge.png" height="28px"></a>
 
 ## License
 
