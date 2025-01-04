@@ -5,6 +5,40 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/olvrng/ujson?style=flat-square)](https://goreportcard.com/report/github.com/olvrng/ujson)
 [![Github code coverage](https://img.shields.io/badge/code%20coverage-97%25-brightgreen?style=flat-square)](https://gocover.io/github.com/olvrng/ujson)
 
+---
+
+👉 _Checkout the new library for iterating unstructured JSON with [Go1.23 iterator](https://pkg.go.dev/iter#hdr-Iterators) syntax_ 👈
+
+## [ezpkg.io/iter.json](https://ezpkg.io/iter.json) &middot; A Powerful and Efficient Way to Iterate and Manipulate Unstructured JSON in Go
+
+<a href="https://pkg.go.dev/ezpkg.io/iter.json" target="_blank"> <img alt="godoc" src="https://pkg.go.dev/badge/ezpkg.io/iter.json" style="height: 28px"></a>
+<a href="https://github.com/ezpkg/iter.json" target="_blank"> <img alt="source" src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&amp;logo=github&amp;logoColor=white"> </a>
+
+Read more about [iter.json](https://ezpkg.io/iter.json) on [the introduction article](https://olivernguyen.io/w/iter.json/).
+
+Example usage:
+
+```go
+package main
+
+import "ezpkg.io/iter.json"
+
+func main() {
+    data := `{"id": 12345, "name": "foo", "numbers": ["one", "two"]}`
+    // 👇 iterate over the JSON with Go1.23 iterator syntax
+    for item, err := range iterjson.Parse([]byte(data)) {
+        if err != nil { panic(err) }
+        println(item.GetPathString(), item.Key, item.Token, item.Level)
+    }
+}
+```
+
+---
+
+## µjson
+
+_(is now deprecated and replaced by [iter.json](https://ezpkg.io/iter.json))_
+
 A fast and minimal JSON parser and transformer that works on unstructured JSON.
 It works by parsing input and calling the given callback function when
 encountering each item.
